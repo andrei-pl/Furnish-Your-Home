@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- AndroidManifest items -->
+    <string name="app_name">Furnish Your Home</string>
+    <string name="google_maps_key">AIzaSyCl02dXmSpwdA1YVyerDvoPO1JtNzIzh0c</string>
+    <!-- activity_add_room items -->
+
+    <!-- activity_main items -->
+    <string name="appID">"ueFuNcN0Cx1xgBzycLJOgwqGqLwDzlt9zJEHulqJ"</string>
+    <string name="appKey">"s1vnSldgEhOfOMyBfIXSnKsl8F7YHuGNXisSr2jM"</string>
+    <string name="action_search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
+    <string name="drawer_open">Drawer Opened</string>
+    <string name="drawer_close">Drawer Closed</string>
+
+    <string name="app_id">dxTVScOdhW0EEjfB7oY36ydBaOeEbGgKpNEaFYI7</string>
+    <string name="app_key">cstx4Gx4ERIdEt9AJYXMR9p2SokrOuvDVuKev5Ey</string>
+
+    <string name="action_search_hint">Search...</string>
+    <string name="desc_list_item_icon">Item Icon</string>
+    <!-- activity_main items -->
+
+    <!-- nav_drawer_right_fragment items -->
+
+    <string name="no_item_selected">"Не си си избрал мебел."</string>
+    <string name="price">"Цена: "</string>
+    <string name="dimensions">Размери:\n</string>
+    <string name="material">Материали:\n</string>
+    <string name="info">Допълнителана информация:\n</string>
+    <!-- nav_drawer_right_fragment items -->
+
+    <!-- my_furniture_fragment items -->
+    <string name="total_price">"Общо: "</string>
+    <string name="currency">" лв."</string>
+    <!-- my_furniture_fragment items -->
+
+
+    <array name="tabs_three">
+        <item>My Room</item>
+        <item>My furniture</item>
+        <item>Map</item>
+    </array>
+
+    <array name="tabs_two">
+        <item>My Room</item>
+        <item>Map</item>
+    </array>
+
+    <string name="title_activity_about">AboutActivity</string>
+
+    <string name="about">Created by:\nStanimir Spasov\nAndrey Traykov</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

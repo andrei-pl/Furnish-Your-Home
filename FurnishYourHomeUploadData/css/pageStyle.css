@@ -1,0 +1,40 @@
+﻿#container {
+    width: 1000px;
+    margin: 10px auto;
+}
+
+.container-item {
+    width: 300px;
+    margin: 10px 0;
+    display: inline-block;
+}
+
+.vertical-middle {
+    vertical-align:middle;
+}
+
+.vertical-top {
+        vertical-align:top;
+}
+
+#additional-information {
+    display:inline-block;
+}
+
+input[type=text]{
+    margin: 2px 0;
+}
+
+#operations {
+    background-color:yellow;
+    padding: 20px;
+}
+.horizontal-left{
+    text-align:left;
+    margin: 10px 0;
+}
+
+.additional-info {
+    color: red;
+    margin-top:0;
+}

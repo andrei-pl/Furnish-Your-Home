@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>My Parse App</title>
+    <meta name="description" content="My Parse App">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/pageStyle.css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
+</head>
+<body onload="loadData()">
+    <div id="container">
+        <div id="furniture-container" class="container-item vertical-middle">
+            <p><label>Furniture</label></p>
+            <input type="text" name="nameFurniture" id="idNameFurniture" placeholder="model name" />
+            <input type="text" name="info" id="idInfo" placeholder="info" />
+            <input type="text" name="material" id="idMaterial" placeholder="material" />
+            <input type="text" name="dimension" id="idDimensions" placeholder="dimensions" />
+            <input type="text" name="price" id="idPrice" placeholder="price" />
+            <input type="text" name="storeId" id="idStoreId" placeholder="storeId" />
+            <input type="text" name="typeId" id="idTypeId" placeholder="typeId" />
+            <div>
+                <label for="idFurnitureImage">furniture Image</label>
+                <input type="file" name="furnitureImage" id="idFurnitureImage" />
+            </div>
+        </div>
+        <div id="additional-information">
+            <div id="type-container" class="container-item vertical-middle">
+                <div><label class="additional-info">Complete only when typeId is empty</label></div>
+                <p><label>Type</label></p>
+                <input type="text" name="nameType" id="idNameType" placeholder="type name" />
+                <div>
+                    <label for="idTypeImage">type image</label>
+                    <input type="file" name="typeImage" id="idTypeImage" />
+                </div>
+            </div>
+            <div id="store-container" class="container-item vertical-middle">
+                <div><label class="additional-info">Complete only when storeId is empty</label></div>
+                <p><label>Store</label></p>
+                <input type="text" name="nameStore" id="idNameStore" placeholder="store name" />
+                <input type="text" name="address" id="idAddress" placeholder="address" />
+                <input type="text" name="latitude" id="idLatitude" placeholder="latitude" />
+                <input type="text" name="longitude" id="idLongitude" placeholder="longitude" />
+                <input type="text" name="customersPhone" id="idCustomersphone" placeholder="customers phone" />
+                <input type="text" name="email" id="idEmail" placeholder="email" />
+                <input type="text" name="webpage" id="idWebpage" placeholder="webpage" />
+                <input type="text" name="workingHours" id="idWorkingHours" placeholder="working hours" />
+                <div>
+                    <label for="idLogo">Logo</label>
+                    <input type="file" name="logo" id="idLogo" />
+                </div>
+            </div>
+        </div>
+        <div id="operations">
+            <div class="horizontal-left">
+                <input type="button" value="Send" onclick="sendData()" />
+            </div>
+            <div class="horizontal-left">
+                <input type="button" value="Delete" onclick="deleteItem()" />
+                <input type="text" id="idDeleteItem" placeholder="id of the item for deleting">
+                <label style="font-size: 14px">(Only items. You can't delete stores or types.)</label>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        Parse.initialize("dxTVScOdhW0EEjfB7oY36ydBaOeEbGgKpNEaFYI7", "9tWqc8nV8a3myB6clMgmkNhJwetyoGmdmhmtfdbQ");
+    </script>
+    <script src="scripts/furniture.js"></script>
+</body>
+</html>

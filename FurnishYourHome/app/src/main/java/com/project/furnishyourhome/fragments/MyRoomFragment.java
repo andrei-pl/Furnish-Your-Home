@@ -37,14 +37,17 @@ import com.project.furnishyourhome.models.CustomBitmap;
 import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.HolderCount;
+import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Type;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
+import com.project.furnishyourhome.models.parse.StoreFurnitureParse;
 import com.project.furnishyourhome.services.DataCountService;
 
 import org.lucasr.twowayview.TwoWayView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MyRoomFragment extends Fragment implements DbTableNames {
@@ -384,12 +387,15 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 
     private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
 
-        boolean isFromInternet = false;
-        ArrayList<CustomListItem> leftNavitems;
+        private boolean isFromInternet = false;
+        private ArrayList<CustomListItem> leftNavitems;
+        private ArrayList<StoreFurnitureParse> storesFurnituresList;
+        private HashMap<String, ArrayList<Furniture>> furnitureLists;
 
         private GetAsyncResult(boolean isFromInternet) {
             this.isFromInternet = isFromInternet;
             leftNavitems = new ArrayList<>();
+            storesFurnituresList = new ArrayList<>();
         }
 
         @Override
@@ -427,25 +433,76 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 e.printStackTrace();
             }
 
-            final ParseQuery<FurnitureParse> furnitureItems = ParseQuery.getQuery(FurnitureParse.class);
-            List<FurnitureParse> fItems = null;
+//            final ParseQuery<FurnitureParse> furnitureItems = ParseQuery.getQuery(FurnitureParse.class);
+//            List<FurnitureParse> fItems = null;
+//
+//            try {
+//                fItems = furnitureItems.find();
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+
+            final ParseQuery<StoreFurnitureParse> storesFurnitures = ParseQuery.getQuery(StoreFurnitureParse.class);
+            List<StoreFurnitureParse> fStoresFurnitures = null;
 
             try {
-                fItems = furnitureItems.find();
+                fStoresFurnitures = storesFurnitures.find();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            HashMap<String, ArrayList<Furniture>> storeItems = new HashMap<>();
+            HashMap<String, ArrayList<Store>> furnitureStores = new HashMap<>();
+            HashMap<String, Furniture> furnituresHashMap = new HashMap<>();
 
-            furnitures = new ArrayList<>();
-            if (fItems != null) {
-                for (FurnitureParse fItem : fItems) {
-                    String type = fItem.getType();
+            if(fStoresFurnitures != null){
+                // Ready to send data in DB
+                storesFurnituresList = new ArrayList<>(fStoresFurnitures);
 
-                    // Now SofaParse and TableParse became useless
-                    Furniture furniture = fItem.getFurniture();
-                    furnitures.add(furniture);
+                for (StoreFurnitureParse item : fStoresFurnitures){
+                    Store currStore = item.getStore();
+                    Furniture currFurniture = item.getFurniture();
+
+                    String currStoreId = currStore.getObjectId().toString();
+                    if(!storeItems.containsKey(currStoreId)){
+                        storeItems.put(currStoreId, new ArrayList<Furniture>());
+                    }
+
+                    String currFurnitureId = currFurniture.getObjectId().toString();
+                    if(!furnitureStores.containsKey(currFurnitureId)){
+                        furnitureStores.put(currFurnitureId, new ArrayList<Store>());
+                        furnituresHashMap.put(currFurnitureId, currFurniture);
+                    }
+
+                    storeItems.get(currStore).add(currFurniture);
+                    furnitureStores.get(currFurniture).add(currStore);
+                    furnituresHashMap.get(currFurnitureId).getStores().add(currStore);
                 }
             }
+
+            furnitures = new ArrayList<>();
+            furnitureLists = new HashMap<>();
+
+            for (Furniture furn : furnituresHashMap.values()){
+
+                furnitures.add(furn);
+
+                String fType = furn.getType();
+
+                if (!furnitureLists.containsKey(fType)) {
+                    furnitureLists.put(fType, new ArrayList<Furniture>());
+                }
+
+                furnitureLists.get(fType).add(furn);
+            }
+//            if (fItems != null) {
+//                for (FurnitureParse fItem : fItems) {
+//                    String type = fItem.getType();
+//
+//                    // Now SofaParse and TableParse became useless
+//                    Furniture furniture = fItem.getFurniture();
+//                    furnitures.add(furniture);
+//                }
+//            }
             Log.d(TAG, "Data from internet saved");
             return null;
         }
@@ -467,7 +524,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 } else {
                     Log.d("Database", "Something went wrong (types)");
                 }
-                boolean isSavedItemsIntoDB = ((FYHApp) activity.getApplication()).getUtilitiesDb().addItems(furnitures);
+                boolean isSavedItemsIntoDB = ((FYHApp) activity.getApplication()).getUtilitiesDb().addItems(storesFurnituresList);
                 if (isSavedItemsIntoDB) {
                     Log.d("Database", "Items saved into DB");
                 } else {
@@ -504,7 +561,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
             item.setDimensions(furniture.get(i).getDimensions());
             item.setMaterial(furniture.get(i).getMaterial());
             item.setInfo(furniture.get(i).getInfo());
-            item.setStore(furniture.get(i).getStore());
+            item.setStores(furniture.get(i).getStores());
             listItems.add(item);
         }
         return listItems;

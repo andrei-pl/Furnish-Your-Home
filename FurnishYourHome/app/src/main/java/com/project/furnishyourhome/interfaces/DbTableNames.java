@@ -6,4 +6,5 @@ public interface DbTableNames {
     final String TABLE_FURNITURES = "Furnitures";
     final String TABLE_STORES = "Stores";
     final String TABLE_TYPES = "Types";
+    final String TABLE_STORESFURNITURES = "StoresFurnitures";
 }

@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class Store implements Parcelable {
     private String objectId;
@@ -19,11 +20,15 @@ public class Store implements Parcelable {
     private String customersPhone;
     private String webpage;
     private Location location;
+    private ArrayList<Furniture> furnitures;
 
-    public Store (){}
+    public Store (){
+        this.furnitures = new ArrayList<>();
+    }
 
     public Store (Parcel in){
          super();
+        this.furnitures = new ArrayList<>();
         objectId 		= in.readString();
         name 			= in.readString();
 
@@ -42,6 +47,7 @@ public class Store implements Parcelable {
         newLocation.setLatitude(doubleArray[0]);
         newLocation.setLongitude(doubleArray[1]);
         this.setLocation(newLocation);
+        this.furnitures = in.createTypedArrayList(Furniture.CREATOR);
     }
 
     @Override
@@ -75,6 +81,7 @@ public class Store implements Parcelable {
                 loc.getLatitude(),
                 loc.getLongitude()
         });
+        out.writeTypedList(this.furnitures);
     }
 
     public static final Parcelable.Creator<Store> CREATOR = new Creator<Store>(){
@@ -160,5 +167,13 @@ public class Store implements Parcelable {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public ArrayList<Furniture> getFurnitures() {
+        return furnitures;
+    }
+
+    public void setFurnitures(ArrayList<Furniture> furnitures) {
+        this.furnitures = furnitures;
     }
 }

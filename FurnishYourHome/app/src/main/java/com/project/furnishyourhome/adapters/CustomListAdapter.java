@@ -57,7 +57,8 @@ public class CustomListAdapter extends BaseAdapter {
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tv_title_menu);
         if(layoutID == R.layout.favourites_list_item) {
             TextView tvInfo = (TextView) convertView.findViewById(R.id.tv_extra_info_menu);
-            tvInfo.setText("Store: "+this.listItems.get(position).getStore().getName());
+            tvInfo.setText("Store: ");
+           // tvInfo.setText("Store: "+this.listItems.get(position).getStores().getName());
         }
 
         Bitmap bitmap = listItems.get(position).getBitmap();

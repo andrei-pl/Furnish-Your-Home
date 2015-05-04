@@ -13,9 +13,11 @@ import com.project.furnishyourhome.interfaces.DbTableNames;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Type;
+import com.project.furnishyourhome.models.parse.StoreFurnitureParse;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Andrey on 23.2.2015 г..
@@ -27,36 +29,69 @@ public class UtilitiesDb implements DbTableNames{
         this.utilityDb = db;
     }
 
-    public boolean addItems(ArrayList<Furniture> furnitures) {
-        for (Furniture furniture : furnitures){
-            String id = furniture.getObjectId();
+    public boolean addItems(ArrayList<StoreFurnitureParse> storesFurnituresList) {
 
-            if(isIdExist(id, TABLE_FURNITURES) <= 0) {
-                String name = furniture.getName();
-                String material = furniture.getMaterial();
-                String info = furniture.getInfo();
-                String dimension = furniture.getDimensions();
-                String price = String.valueOf(furniture.getPrice());
-                Bitmap drawable = furniture.getDrawable();
-                String furnitureId = furniture.getFurnitureId();
-                String storeId = furniture.getStoreId();
-                byte[] imgData = getBitmapAsByteArray(drawable);
-                Store store = furniture.getStore();
+        //TODO change this: must take data from StoresFurniture in Parse instead ArrayList<Furniture>
+        for (StoreFurnitureParse item : storesFurnituresList){
+            String id = item.getObjectId();
 
+            if(isIdExist(id, TABLE_STORESFURNITURES) <= 0) {
+                Furniture furniture = item.getFurniture();
+
+                if(isIdExist(furniture.getObjectId(), TABLE_FURNITURES) <= 0) {
+                    String name = furniture.getName();
+                    String material = furniture.getMaterial();
+                    String info = furniture.getInfo();
+                    String dimension = furniture.getDimensions();
+                    String price = String.valueOf(furniture.getPrice());
+                    Bitmap drawable = furniture.getDrawable();
+                    String furnitureId = furniture.getFurnitureId();
+                    // String storeId = furniture.getStoreId();
+                    byte[] imgData = getBitmapAsByteArray(drawable);
+                    //Store store = furniture.getStore();
+
+                    //put furniture in DB
+                    try {
+                        ContentValues reg = new ContentValues();
+                        reg.put("_id", id);
+                        reg.put("name", name);
+                        reg.put("material", material);
+                        reg.put("info", info);
+                        reg.put("dimensions", dimension);
+                        reg.put("price", price);
+                        reg.put("drawable", imgData);
+                        reg.put("furnitureId", furnitureId);
+                        //reg.put("storeId", storeId);
+                        utilityDb.insert(TABLE_FURNITURES, null, reg);
+
+                        //addStore(store);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+
+                // You can get all stores for every furniture and add them in DB every time even if the store already exist
+                // without repeating it in DB
+                // But is this the best way???
+                // ArrayList<Store> stores = furniture.getStores();
+
+                // put store in DB
+//                for (Store store : stores){
+//                    this.addStore(store);
+//                    String storeId = store.getObjectId();
+//                }
+                Store store = item.getStore();
+                this.addStore(store);
+
+                // Put furnitureId and storeId in the many to many connection table
                 try {
                     ContentValues reg = new ContentValues();
-                    reg.put("_id", id);
-                    reg.put("name", name);
-                    reg.put("material", material);
-                    reg.put("info", info);
-                    reg.put("dimensions", dimension);
-                    reg.put("price", price);
-                    reg.put("drawable", imgData);
-                    reg.put("furnitureId", furnitureId);
-                    reg.put("storeId", storeId);
-                    utilityDb.insert(TABLE_FURNITURES, null, reg);
+                    reg.put("_id", item.getObjectId());
+                    reg.put("storeId", store.getObjectId());
+                    reg.put("furnitureId", furniture.getObjectId());
+                    utilityDb.insert(TABLE_STORESFURNITURES, null, reg);
 
-                    addStore(store);
+                    //addStore(store);
                 } catch (Exception e) {
                     return false;
                 }
@@ -154,55 +189,84 @@ public class UtilitiesDb implements DbTableNames{
     public ArrayList<Furniture> getAllItems() {
         ArrayList<Furniture> temp = new ArrayList<>();
 
-        if(getTableCount(TABLE_FURNITURES) > 0) {
-            String sql = "SELECT * FROM " + TABLE_FURNITURES;
+        HashMap<String, ArrayList<Store>> furnituresHashMap = new HashMap<>();
+
+        if(getTableCount(TABLE_STORESFURNITURES) > 0){
+            String sql = "SELECT * FROM " + TABLE_STORESFURNITURES;
 
             Cursor allItems = utilityDb.rawQuery(sql, null);
 
             while (allItems.moveToNext()) {
-                String id = allItems.getString(0);
-                String name = allItems.getString(1);
-                String material = allItems.getString(2);
-                String info = allItems.getString(3);
-                String dimensions = allItems.getString(4);
-                String price = allItems.getString(5);
-                double priceAsDouble = Double.parseDouble(price);
-                String furnitureId = allItems.getString(7);
-                String storeid = allItems.getString(8);
-                byte[] image = allItems.getBlob(allItems.getColumnIndex("drawable"));
-                Bitmap bitmap = getImage(image);
+                String storeId = allItems.getString(1);
+                String furnitureId = allItems.getString(2);
 
-                //get store for the item
-                Store store = getStore(storeid);
-
-                if (bitmap == null) {
-                    bitmap = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.ic_launcher);
+                if(!furnituresHashMap.containsKey(furnitureId)){
+                    furnituresHashMap.put(furnitureId, new ArrayList<Store>());
                 }
 
-                Furniture baseItem = null;
-                // check type is this a Sofa or Table
-                String type = getType(furnitureId);
+                furnituresHashMap.get(furnitureId).add(this.getStore(storeId));
+            }
 
-                baseItem = new Furniture();
-                baseItem.setType(type);
+            for (String furnitureId : furnituresHashMap.keySet()){
+                Furniture furniture = this.getFurniture(furnitureId);
 
-                assert baseItem != null;
-                baseItem.setObjectId(id);
-                baseItem.setName(name);
-                baseItem.setMaterial(material);
-                baseItem.setInfo(info);
-                baseItem.setDimensions(dimensions);
-                baseItem.setPrice(priceAsDouble);
-                baseItem.setFurnitureId(furnitureId);
-                baseItem.setStoreId(storeid);
-                baseItem.setDrawable(bitmap);
-                baseItem.setStore(store);
-
-                temp.add(baseItem);
+                ArrayList<Store> stores = new ArrayList<>(furnituresHashMap.get(furnitureId));
+                furniture.setStores(stores);
+                temp.add(furniture);
             }
 
             allItems.close();
         }
+
+//        if(getTableCount(TABLE_FURNITURES) > 0) {
+//            String sql = "SELECT * FROM " + TABLE_FURNITURES;
+//
+//            Cursor allItems = utilityDb.rawQuery(sql, null);
+//
+//            while (allItems.moveToNext()) {
+//                String id = allItems.getString(0);
+//                String name = allItems.getString(1);
+//                String material = allItems.getString(2);
+//                String info = allItems.getString(3);
+//                String dimensions = allItems.getString(4);
+//                String price = allItems.getString(5);
+//                double priceAsDouble = Double.parseDouble(price);
+//                String furnitureId = allItems.getString(7);
+////                String storeid = allItems.getString(8);
+//                byte[] image = allItems.getBlob(allItems.getColumnIndex("drawable"));
+//                Bitmap bitmap = getImage(image);
+//
+//                //get store for the item
+////                Store store = getStore(storeid);
+//
+//                if (bitmap == null) {
+//                    bitmap = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.ic_launcher);
+//                }
+//
+//                Furniture baseItem = null;
+//                // check type is this a Sofa or Table
+//                String type = getType(furnitureId);
+//
+//                baseItem = new Furniture();
+//                baseItem.setType(type);
+//
+//                assert baseItem != null;
+//                baseItem.setObjectId(id);
+//                baseItem.setName(name);
+//                baseItem.setMaterial(material);
+//                baseItem.setInfo(info);
+//                baseItem.setDimensions(dimensions);
+//                baseItem.setPrice(priceAsDouble);
+//                baseItem.setFurnitureId(furnitureId);
+//                //baseItem.setStoreId(storeid);
+//                baseItem.setDrawable(bitmap);
+//                //baseItem.setStore(store);
+//
+//                temp.add(baseItem);
+//            }
+//
+//            allItems.close();
+//        }
 
         return temp;
     }
@@ -259,6 +323,52 @@ public class UtilitiesDb implements DbTableNames{
             c.close();
         }
         return store;
+    }
+
+    private Furniture getFurniture (String furnitureId){
+        Furniture furniture = new Furniture();
+        if(isIdExist(furnitureId, TABLE_FURNITURES) == 1) {
+            String sql = "SELECT * FROM " + TABLE_FURNITURES + " WHERE _id='"
+                    + furnitureId + "'";
+
+            Cursor c = utilityDb.rawQuery(sql, null);
+            c.moveToFirst();
+            furniture = loadFurnitureData(c);
+
+            c.close();
+        }
+        return furniture;
+    }
+
+    private Furniture loadFurnitureData(Cursor c) {
+        Furniture furniture = new Furniture();
+
+        String id = c.getString(0);
+        String name = c.getString(1);
+        String material = c.getString(2);
+        String info = c.getString(3);
+        String dimensions = c.getString(4);
+        String price = c.getString(5);
+        byte[] drawable = c.getBlob(6);
+        Bitmap bitmap = getImage(drawable);
+        String typeId = c.getString(7);
+        double priceDouble = Double.parseDouble(price);
+
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.ic_launcher);
+        }
+
+        furniture.setObjectId(id);
+        furniture.setName(name);
+        furniture.setMaterial(material);
+        furniture.setInfo(info);
+        furniture.setDimensions(dimensions);
+        furniture.setPrice(priceDouble);
+        furniture.setDrawable(bitmap);
+        furniture.setType(this.getType(typeId));
+        furniture.setFurnitureId(typeId);
+
+        return furniture;
     }
 
     private void loadStoreData(Store store, Cursor c) {

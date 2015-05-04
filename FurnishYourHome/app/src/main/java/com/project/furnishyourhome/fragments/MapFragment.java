@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.models.CustomListItem;
+import com.project.furnishyourhome.models.Store;
 
 import java.util.ArrayList;
 
@@ -159,16 +160,21 @@ public class MapFragment extends Fragment {
     private void showStoresOnMap() {
         Log.d(TAG, "showStoresOnMap()");
         for(int i=0; i<storesLocations.size(); i++) {
-            double lat = storesLocations.get(i).getStore().getLocation().getLatitude();
-            double lng = storesLocations.get(i).getStore().getLocation().getLongitude();
+
+            ArrayList<Store> storesList = new ArrayList<>();
+            storesList = storesLocations.get(i).getStores();
+            for (Store currStore : storesList) {
+                double lat = currStore.getLocation().getLatitude();
+                double lng = currStore.getLocation().getLongitude();
 
 
-            MarkerOptions storeLocation = new MarkerOptions();
-            storeLocation.position(new LatLng(lat, lng));
-            storeLocation.title(storesLocations.get(i).getStore().getName());
-            storeLocation.icon(BitmapDescriptorFactory.fromBitmap(storesLocations.get(i).getStore().getLogo()));
-            map.addMarker(storeLocation);
-            Log.d(TAG, storesLocations.get(i).getStore().getName()+": "+lat+" "+lng);
+                MarkerOptions storeLocation = new MarkerOptions();
+                storeLocation.position(new LatLng(lat, lng));
+                storeLocation.title(currStore.getName());
+                storeLocation.icon(BitmapDescriptorFactory.fromBitmap(currStore.getLogo()));
+                map.addMarker(storeLocation);
+                Log.d(TAG, currStore.getName() + ": " + lat + " " + lng);
+            }
         }
     }
 

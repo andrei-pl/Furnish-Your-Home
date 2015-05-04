@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class CustomListItem implements Parcelable {
     private String title;
@@ -15,17 +16,20 @@ public class CustomListItem implements Parcelable {
     private String dimensions;
     private String material;
     private String info;
+    private ArrayList<Store> stores;
 
-    private Store store;
-
-    public CustomListItem(){}
+    public CustomListItem(){
+        this.stores = new ArrayList<>();
+    }
 
     public CustomListItem(String title, Bitmap bitmap){
+        this.stores = new ArrayList<>();
         this.title = title;
         this.bitmap = bitmap;
     }
 
     private CustomListItem(Parcel in) {
+        //this.stores = new ArrayList<>();
         this.title = in.readString();
         in.readByteArray(byteArray);
         this.bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
@@ -108,11 +112,11 @@ public class CustomListItem implements Parcelable {
         this.info = info;
     }
 
-    public Store getStore() {
-        return store;
+    public ArrayList<Store> getStores() {
+        return stores;
     }
 
-    public void setStore(Store store) {
-        this.store = store;
+    public void setStores(ArrayList<Store> stores) {
+        this.stores = stores;
     }
 }

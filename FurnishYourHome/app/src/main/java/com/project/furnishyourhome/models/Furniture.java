@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class Furniture implements Parcelable {
 
@@ -17,20 +18,17 @@ public class Furniture implements Parcelable {
     private String dimensions;
     private String material;
     private String info;
-    private Store store;
-    private String storeId;
     private String furnitureId;
     private String type;
+    private ArrayList<Store> stores;
 
     public Furniture(){
-    }
-
-    public Furniture(String storeId) {
-        this.storeId = storeId;
+        this.stores = new ArrayList<>();
     }
 
     protected Furniture(Parcel in) {
         super();
+        this.stores = new ArrayList<>();
         objectId = in.readString();
         name = in.readString();
 
@@ -41,8 +39,7 @@ public class Furniture implements Parcelable {
         dimensions = in.readString();
         material = in.readString();
         info = in.readString();
-        store = in.readParcelable(Store.class.getClassLoader());
-        storeId = in.readString();
+        this.stores = in.createTypedArrayList(Store.CREATOR);
     }
 
     @Override
@@ -69,8 +66,7 @@ public class Furniture implements Parcelable {
         out.writeString(dimensions);
         out.writeString(material);
         out.writeString(info);
-        out.writeParcelable(store,flags);
-        out.writeString(storeId);
+        out.writeTypedList(this.stores);
     }
 
     public static final Parcelable.Creator<Furniture> CREATOR = new Parcelable.Creator<Furniture>() {
@@ -85,22 +81,12 @@ public class Furniture implements Parcelable {
         }
     };
 
-
-
     public String getObjectId() {
         return objectId;
     }
 
     public void setObjectId(String objectId) {
         this.objectId = objectId;
-    }
-
-    public String getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(String storeId) {
-        this.storeId = storeId;
     }
 
     public String getDimensions() {
@@ -151,20 +137,11 @@ public class Furniture implements Parcelable {
         this.price = price;
     }
 
-    public Store getStore() {
-        return store;
-    }
-
-    public void setStore(Store store) {
-        this.store = store;
-    }
-
-
     public byte[] getImageAsByteArray (){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         getDrawable().compress(Bitmap.CompressFormat.PNG, 100, stream);
         //byte[] byteArray = stream.toByteArray();
-        byteArray = stream.toByteArray(); // TODO: CHANGED
+        byteArray = stream.toByteArray();
 
         return byteArray;
     }
@@ -183,5 +160,13 @@ public class Furniture implements Parcelable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public ArrayList<Store> getStores() {
+        return this.stores;
+    }
+
+    public void setStores(ArrayList<Store> stores) {
+        this.stores = stores;
     }
 }

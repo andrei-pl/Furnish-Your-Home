@@ -49,8 +49,10 @@ import com.project.furnishyourhome.models.CustomListItem;
 import com.project.furnishyourhome.models.CustomViewPager;
 import com.project.furnishyourhome.models.Furniture;
 import com.project.furnishyourhome.models.SimpleGestureFilter;
+import com.project.furnishyourhome.models.Store;
 import com.project.furnishyourhome.models.Type;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
+import com.project.furnishyourhome.models.parse.StoreFurnitureParse;
 import com.project.furnishyourhome.models.parse.StoreParse;
 
 import java.util.ArrayList;
@@ -101,6 +103,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         }
         ParseObject.registerSubclass(StoreParse.class);
         ParseObject.registerSubclass(FurnitureParse.class);
+        ParseObject.registerSubclass(StoreFurnitureParse.class);
         Parse.initialize(this, getResources().getString(R.string.app_id), getResources().getString(R.string.app_key));
 
         detector = new SimpleGestureFilter(this, this);
@@ -420,7 +423,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 item.setDimensions(furniture.get(i).getDimensions());
                 item.setMaterial(furniture.get(i).getMaterial());
                 item.setInfo(furniture.get(i).getInfo());
-                item.setStore(furniture.get(i).getStore());
+                //item.setStore(furniture.get(i).getStore());
+                item.setStores(furniture.get(i).getStores());
                 listItems.add(item);
             }
         }
@@ -453,6 +457,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
     private class GetAsyncResult extends AsyncTask<Void, Void, Void> {
 
         boolean localIsFromInternet = false;
+        ArrayList<StoreFurnitureParse> storesFurnituresList;
 
         private GetAsyncResult(boolean isFromInternet) {
             localIsFromInternet = isFromInternet;
@@ -462,6 +467,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         @Override
         protected void onPreExecute() {
             Log.d(TAG, "loadData() - onPreExecute()");
+            storesFurnituresList = new ArrayList<>();
             if (!localIsFromInternet) {
                 //showProgressDialog();
             }
@@ -537,29 +543,79 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             }
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - leftNavDrawerItems: "+leftNavDrawerItems);
 
-            final ParseQuery<FurnitureParse> furnitureItems = ParseQuery.getQuery(FurnitureParse.class);
-            List<FurnitureParse> fItems = null;
+//            final ParseQuery<FurnitureParse> furnitureItems = ParseQuery.getQuery(FurnitureParse.class);
+//            List<FurnitureParse> fItems = null;
+//
+//            try {
+//                fItems = furnitureItems.find();
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+
+            final ParseQuery<StoreFurnitureParse> storesFurnitures = ParseQuery.getQuery(StoreFurnitureParse.class);
+            List<StoreFurnitureParse> fStoresFurnitures = null;
 
             try {
-                fItems = furnitureItems.find();
+                fStoresFurnitures = storesFurnitures.find();
             } catch (ParseException e) {
                 e.printStackTrace();
+            }
+            HashMap<String, ArrayList<Furniture>> storeItems = new HashMap<>();
+            HashMap<String, ArrayList<Store>> furnitureStores = new HashMap<>();
+            HashMap<String, Furniture> furnituresHashMap = new HashMap<>();
+
+            if(fStoresFurnitures != null){
+                // Ready to send data in DB
+                storesFurnituresList = new ArrayList<>(fStoresFurnitures);
+
+                for (StoreFurnitureParse item : fStoresFurnitures){
+                    Store currStore = item.getStore();
+                    Furniture currFurniture = item.getFurniture();
+
+                    String currStoreId = currStore.getObjectId().toString();
+                    if(!storeItems.containsKey(currStoreId)){
+                        storeItems.put(currStoreId, new ArrayList<Furniture>());
+                    }
+
+                    String currFurnitureId = currFurniture.getObjectId().toString();
+                    if(!furnitureStores.containsKey(currFurnitureId)){
+                        furnitureStores.put(currFurnitureId, new ArrayList<Store>());
+                        furnituresHashMap.put(currFurnitureId, currFurniture);
+                    }
+
+                    storeItems.get(currStore).add(currFurniture);
+                    furnitureStores.get(currFurniture).add(currStore);
+                    furnituresHashMap.get(currFurnitureId).getStores().add(currStore);
+                }
             }
 
             furnitures = new ArrayList<>();
             furnitureLists = new HashMap<>();
-            if (fItems != null) {
-                for (FurnitureParse fItem : fItems) {
-                    // Now SofaParse and TableParse became useless
 
-                    Furniture furniture = fItem.getFurniture();
-                    furnitures.add(furniture);
+            for (Furniture furn : furnituresHashMap.values()){
 
-                    String fType = furniture.getType();
-                    initializeHashMapKey(fType);
-                    furnitureLists.get(fType).add(furniture);
-                }
+                furnitures.add(furn);
+
+                String fType = furn.getType();
+                initializeHashMapKey(fType);
+                furnitureLists.get(fType).add(furn);
             }
+//
+//            if (fItems != null) {
+//                for (FurnitureParse fItem : fItems) {
+//                    // Now SofaParse and TableParse became useless
+//
+//                    Furniture furniture = fItem.getFurniture();
+//
+//                    String furnitureId = furniture.getObjectId();
+//
+//                    furnitures.add(furniture);
+//
+//                    String fType = furniture.getType();
+//                    initializeHashMapKey(fType);
+//                    furnitureLists.get(fType).add(furniture);
+//                }
+//            }
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - furnitures: "+furnitures);
             Log.d(TAG, "loadData() - doInBackground() - downloadData() - furnitureLists: "+furnitureLists);
             Log.d(TAG, "loadData() - onPostExecute() - dismissProgressDialog()");
@@ -599,7 +655,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
             MyRoomFragment fragment = (MyRoomFragment) getSupportFragmentManager().findFragmentByTag("MyRoomFragment");
             if(fragment != null) {
-                Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);//TODO: bug when resuming
+                Fragment.SavedState myFragmentState = getSupportFragmentManager().saveFragmentInstanceState(fragment);
                 FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
                 MyRoomFragment newFragment = MyRoomFragment.newInstance(args);
                 newFragment.setInitialSavedState(myFragmentState);
@@ -630,7 +686,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                 } else {
                     Log.d(TAG, "loadData() - onPostExecute() - saveDataInDb() - Something went wrong (types)");
                 }
-                boolean isSavedItemsIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addItems(furnitures);
+                boolean isSavedItemsIntoDB = ((FYHApp) getApplication()).getUtilitiesDb().addItems(storesFurnituresList);
                 if (isSavedItemsIntoDB) {
                     Log.d(TAG, "loadData() - onPostExecute() - saveDataInDb() - Items saved into DB");
                 } else {

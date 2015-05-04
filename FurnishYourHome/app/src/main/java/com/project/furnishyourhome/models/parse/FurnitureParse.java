@@ -23,7 +23,6 @@ public class FurnitureParse extends ParseObject {
     protected String material;
     protected String name;
     protected double price;
-    protected String storeId;
     protected String type;
     protected String furnitureId;
 
@@ -103,12 +102,12 @@ public class FurnitureParse extends ParseObject {
     }
 
     public String getType() {
-        ParseObject typeObj = getParseObject("furnitureId");
+        ParseObject typeObj = getParseObject("furnitureTypesId");
         this.setFurnitureId(typeObj.getObjectId());
         //String txt = typeObj.getString("type");
         String fType = "";
 
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Furniture");
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("FurnitureTypes");
         try {
             ParseObject fObj = query.get(this.getFurnitureId());
             fType = fObj.getString("type");
@@ -120,7 +119,7 @@ public class FurnitureParse extends ParseObject {
     }
 
     public void setType(String furnitureId) {
-        put("furnitureId", furnitureId);
+        put("furnitureTypesId", furnitureId);
     }
 
     public String getFurnitureId() {
@@ -131,36 +130,34 @@ public class FurnitureParse extends ParseObject {
         this.furnitureId = furnitureId;
     }
 
-    public Store getStore() {
-        ParseObject store = getParseObject("store");
-        this.storeId = store.getObjectId().trim();
-        StoreParse obj = new StoreParse();
-
-        ParseQuery<StoreParse> query = ParseQuery.getQuery(StoreParse.class);
-        try {
-            obj = query.get(this.storeId);
-            obj.setObjectId(this.storeId);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return obj.getStore();
-    }
-
-    public void setStore(String storeId) {
-        put("store", storeId);
-    }
+//    public Store getStore() {
+//        ParseObject store = getParseObject("storeId");
+//        this.storeId = store.getObjectId().trim();
+//        StoreParse obj = new StoreParse();
+//
+//        ParseQuery<StoreParse> query = ParseQuery.getQuery(StoreParse.class);
+//        try {
+//            obj = query.get(this.storeId);
+//            obj.setObjectId(this.storeId);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        return obj.getStore();
+//    }
+//
+//    public void setStore(String storeId) {
+//        put("store", storeId);
+//    }
 
     public Furniture getFurniture(){
-        Furniture furniture = new Furniture(this.storeId);
+        Furniture furniture = new Furniture();
 
         furniture.setDimensions(this.getDimension());
         furniture.setInfo(this.getInfo());
         furniture.setMaterial(this.getMaterial());
         furniture.setName(this.getName());
         furniture.setPrice(this.getPrice());
-        furniture.setStore(this.getStore());
         furniture.setDrawable(this.getDrawable());
-        furniture.setStoreId(this.storeId);
         furniture.setObjectId(this.getObjectId());
         furniture.setFurnitureId(this.getFurnitureId());
         furniture.setType(this.getType());

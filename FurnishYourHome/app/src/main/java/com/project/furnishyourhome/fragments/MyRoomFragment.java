@@ -404,7 +404,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
             try {
                 types = new ArrayList<>();
                 //menu items for left drawer
-                final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("Furniture");
+                final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("FurnitureTypes");
                 List<ParseObject> parseObjects = typesQuery.find();
 
                 for (ParseObject obj : parseObjects) {

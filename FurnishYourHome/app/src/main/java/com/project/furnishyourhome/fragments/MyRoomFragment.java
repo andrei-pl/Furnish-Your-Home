@@ -473,8 +473,8 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                         furnituresHashMap.put(currFurnitureId, currFurniture);
                     }
 
-                    storeItems.get(currStore).add(currFurniture);
-                    furnitureStores.get(currFurniture).add(currStore);
+                    storeItems.get(currStoreId).add(currFurniture);
+                    furnitureStores.get(currFurnitureId).add(currStore);
                     furnituresHashMap.get(currFurnitureId).getStores().add(currStore);
                 }
             }

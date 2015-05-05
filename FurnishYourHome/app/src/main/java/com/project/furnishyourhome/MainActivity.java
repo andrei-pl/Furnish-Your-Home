@@ -511,6 +511,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
             try {
                 types = new ArrayList<>();
                 leftNavDrawerItems = new ArrayList<>();
+
                 //menu items for left drawer
                 final ParseQuery<ParseObject> typesQuery = ParseQuery.getQuery("FurnitureTypes");
                 List<ParseObject> parseObjects = typesQuery.find();
@@ -583,8 +584,8 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
                         furnituresHashMap.put(currFurnitureId, currFurniture);
                     }
 
-                    storeItems.get(currStore).add(currFurniture);
-                    furnitureStores.get(currFurniture).add(currStore);
+                    storeItems.get(currStoreId).add(currFurniture);
+                    furnitureStores.get(currFurnitureId).add(currStore);
                     furnituresHashMap.get(currFurnitureId).getStores().add(currStore);
                 }
             }

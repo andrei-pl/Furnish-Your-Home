@@ -12,9 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.project.furnishyourhome.R;
+import com.project.furnishyourhome.extensionMethods.StringExtensions;
 import com.project.furnishyourhome.models.CustomListItem;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 public class CustomListAdapter extends BaseAdapter {
@@ -57,8 +60,8 @@ public class CustomListAdapter extends BaseAdapter {
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tv_title_menu);
         if(layoutID == R.layout.favourites_list_item) {
             TextView tvInfo = (TextView) convertView.findViewById(R.id.tv_extra_info_menu);
-            tvInfo.setText("Store: ");
-           // tvInfo.setText("Store: "+this.listItems.get(position).getStores().getName());
+            String storesList = StringExtensions.join(", ", this.listItems.get(position).getStores());
+            tvInfo.setText("Stores: "+ storesList);
         }
 
         Bitmap bitmap = listItems.get(position).getBitmap();

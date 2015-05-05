@@ -44,7 +44,6 @@ public class StoreFurnitureParse extends ParseObject {
         ParseQuery<StoreParse> query = ParseQuery.getQuery(StoreParse.class);
         try {
             obj = query.get(this.storeId);
-            obj.setObjectId(this.storeId);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -58,7 +57,6 @@ public class StoreFurnitureParse extends ParseObject {
         ParseQuery<FurnitureParse> query = ParseQuery.getQuery(FurnitureParse.class);
         try {
             obj = query.get(this.furnitureId);
-            obj.setObjectId(this.furnitureId);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -70,7 +68,6 @@ public class StoreFurnitureParse extends ParseObject {
 
         switch (colName) {
             case "furnitureId":
-                //this.furnitureId = storeFurniture.getObjectId().trim();
                 this.furnitureId = storeFurniture.getObjectId().trim();
                 break;
             case "storeId":

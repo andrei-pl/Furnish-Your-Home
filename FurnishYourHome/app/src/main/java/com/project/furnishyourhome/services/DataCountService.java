@@ -14,6 +14,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.project.furnishyourhome.R;
 import com.project.furnishyourhome.models.parse.FurnitureParse;
+import com.project.furnishyourhome.models.parse.StoreFurnitureParse;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -64,7 +65,7 @@ public class DataCountService extends Service {
                 Thread thread = new Thread(new Task());
                 thread.start();
             }
-        }, 1000, 60000);
+        }, 1000, 60*1000);
 
         return Service.START_NOT_STICKY;
     }
@@ -90,7 +91,7 @@ public class DataCountService extends Service {
 
         @Override
         public void run() {
-            final ParseQuery<FurnitureParse> query = ParseQuery.getQuery(FurnitureParse.class);
+            final ParseQuery<StoreFurnitureParse> query = ParseQuery.getQuery(StoreFurnitureParse.class);
 
             try {
                 count = query.count();

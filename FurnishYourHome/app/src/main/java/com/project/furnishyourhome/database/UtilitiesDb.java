@@ -31,21 +31,21 @@ public class UtilitiesDb implements DbTableNames{
 
     public boolean addItems(ArrayList<StoreFurnitureParse> storesFurnituresList) {
 
-        //TODO change this: must take data from StoresFurniture in Parse instead ArrayList<Furniture>
         for (StoreFurnitureParse item : storesFurnituresList){
             String id = item.getObjectId();
 
             if(isIdExist(id, TABLE_STORESFURNITURES) <= 0) {
                 Furniture furniture = item.getFurniture();
+                String furnitureId = furniture.getObjectId().trim();
 
-                if(isIdExist(furniture.getObjectId(), TABLE_FURNITURES) <= 0) {
+                if(isIdExist(furnitureId, TABLE_FURNITURES) <= 0) {
                     String name = furniture.getName();
                     String material = furniture.getMaterial();
                     String info = furniture.getInfo();
                     String dimension = furniture.getDimensions();
                     String price = String.valueOf(furniture.getPrice());
                     Bitmap drawable = furniture.getDrawable();
-                    String furnitureId = furniture.getFurnitureId();
+                    String typeId = furniture.getFurnitureId();
                     // String storeId = furniture.getStoreId();
                     byte[] imgData = getBitmapAsByteArray(drawable);
                     //Store store = furniture.getStore();
@@ -53,14 +53,14 @@ public class UtilitiesDb implements DbTableNames{
                     //put furniture in DB
                     try {
                         ContentValues reg = new ContentValues();
-                        reg.put("_id", id);
+                        reg.put("_id", furnitureId);
                         reg.put("name", name);
                         reg.put("material", material);
                         reg.put("info", info);
                         reg.put("dimensions", dimension);
                         reg.put("price", price);
                         reg.put("drawable", imgData);
-                        reg.put("furnitureId", furnitureId);
+                        reg.put("furnitureId", typeId);
                         //reg.put("storeId", storeId);
                         utilityDb.insert(TABLE_FURNITURES, null, reg);
 
@@ -81,7 +81,9 @@ public class UtilitiesDb implements DbTableNames{
 //                    String storeId = store.getObjectId();
 //                }
                 Store store = item.getStore();
-                this.addStore(store);
+                if(!this.addStore(store)){
+                    return false;
+                };
 
                 // Put furnitureId and storeId in the many to many connection table
                 try {
@@ -90,8 +92,6 @@ public class UtilitiesDb implements DbTableNames{
                     reg.put("storeId", store.getObjectId());
                     reg.put("furnitureId", furniture.getObjectId());
                     utilityDb.insert(TABLE_STORESFURNITURES, null, reg);
-
-                    //addStore(store);
                 } catch (Exception e) {
                     return false;
                 }
@@ -191,33 +191,36 @@ public class UtilitiesDb implements DbTableNames{
 
         HashMap<String, ArrayList<Store>> furnituresHashMap = new HashMap<>();
 
-        if(getTableCount(TABLE_STORESFURNITURES) > 0){
+        if(getTableCount(TABLE_STORESFURNITURES) > 0) {
             String sql = "SELECT * FROM " + TABLE_STORESFURNITURES;
-
             Cursor allItems = utilityDb.rawQuery(sql, null);
 
-            while (allItems.moveToNext()) {
-                String storeId = allItems.getString(1);
-                String furnitureId = allItems.getString(2);
+            try {
+                while (allItems.moveToNext()) {
+                    String storeId = allItems.getString(1);
+                    String furnitureId = allItems.getString(2);
 
-                if(!furnituresHashMap.containsKey(furnitureId)){
-                    furnituresHashMap.put(furnitureId, new ArrayList<Store>());
+                    if (!furnituresHashMap.containsKey(furnitureId)) {
+                        furnituresHashMap.put(furnitureId, new ArrayList<Store>());
+                    }
+
+                    furnituresHashMap.get(furnitureId).add(this.getStore(storeId));
                 }
 
-                furnituresHashMap.get(furnitureId).add(this.getStore(storeId));
+                allItems.close();
+            } catch (Exception e) {
+                allItems.close();
+                return null;
             }
 
-            for (String furnitureId : furnituresHashMap.keySet()){
+            for (String furnitureId : furnituresHashMap.keySet()) {
                 Furniture furniture = this.getFurniture(furnitureId);
 
                 ArrayList<Store> stores = new ArrayList<>(furnituresHashMap.get(furnitureId));
                 furniture.setStores(stores);
                 temp.add(furniture);
             }
-
-            allItems.close();
         }
-
 //        if(getTableCount(TABLE_FURNITURES) > 0) {
 //            String sql = "SELECT * FROM " + TABLE_FURNITURES;
 //
@@ -439,8 +442,9 @@ public class UtilitiesDb implements DbTableNames{
         int countStores = getTableCount(TABLE_STORES);
         int countItems = getTableCount(TABLE_FURNITURES);
         int countTypes = getTableCount(TABLE_TYPES);
+        int countStoresFurnitures = getTableCount(TABLE_STORESFURNITURES);
 
-        if(countItems == 0 && countStores == 0 && countTypes == 0){
+        if(countItems == 0 && countStores == 0 && countTypes == 0  && countStoresFurnitures == 0){
             return true;
         }
 

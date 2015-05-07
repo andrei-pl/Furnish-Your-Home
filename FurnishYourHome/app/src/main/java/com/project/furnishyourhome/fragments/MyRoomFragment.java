@@ -264,9 +264,8 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 showNotification();
                 Log.d("MyRoomFragment", "The data was updated");
             }
-            updateListHandler.postDelayed(taskUpdateList, 5000);
+            updateListHandler.postDelayed(taskUpdateList, 10000);
         }
-
     }
 
     @Override
@@ -509,12 +508,13 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            int itemsCountInDb = ((FYHApp) activity.getApplication()).getUtilitiesDb().getTableCount(TABLE_FURNITURES);
+            int itemsCountInDb = ((FYHApp) activity.getApplication()).getUtilitiesDb().getTableCount(TABLE_STORESFURNITURES);
 
             //if items in Database are more than the items from internet then clean all data
-            if (itemsCountInDb > furnitures.size()) {
+            if (itemsCountInDb > this.storesFurnituresList.size()) {
                 ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_FURNITURES);
                 ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_TYPES);
+                ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_STORESFURNITURES);
             }
 
             if (itemsCountInDb < furnitures.size()) {
@@ -532,7 +532,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 }
             }
 
-            holderCount.count = furnitures.size();
+            holderCount.count = this.storesFurnituresList.size();
             Bundle args = new Bundle();
             ArrayList<CustomListItem> listItems = convertFurnitureToListItem(furnitures);
             args.putParcelableArrayList("horizontalListItems", listItems);

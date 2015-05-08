@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/pageStyle.css" />
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.3.5.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
 </head>
 <body onload="loadData()">
-    <div id="container">
+<div id="container">
+    <div id="container-info">
         <div id="furniture-container" class="container-item vertical-middle">
             <p><label>Furniture</label></p>
             <input type="text" name="nameFurniture" id="idNameFurniture" placeholder="model name" />
@@ -54,20 +55,27 @@
                 </div>
             </div>
         </div>
-        <div id="operations">
-            <div class="horizontal-left">
-                <input type="button" value="Send" onclick="sendData()" />
-            </div>
-            <div class="horizontal-left">
-                <input type="button" value="Delete" onclick="deleteItem()" />
-                <input type="text" id="idDeleteItem" placeholder="id of the item for deleting">
-                <label style="font-size: 14px">(Only items. You can't delete stores or types.)</label>
-            </div>
+    </div>
+    <div id="manyToManyTable">
+        <p><label>Or you want any furniture that already exists to put in another store</label></p>
+        <p><label>Warning! No checks whether repeat. Use it carefully. </label></p>
+        <input type="text" name="furnitureId" id="idFurniture" placeholder="FurnitureId" />
+        <input type="text" name="storeId" id="idStore" placeholder="StoreId" />
+    </div>
+    <div id="operations">
+        <div class="horizontal-left">
+            <input type="button" value="Send" onclick="sendData()" />
+        </div>
+        <div class="horizontal-left">
+            <input type="button" value="Delete" onclick="deleteItem()" />
+            <input type="text" id="idDeleteItem" placeholder="id of the item for deleting">
+            <label style="font-size: 14px">(Only items. You can't delete stores or types.)</label>
         </div>
     </div>
-    <script type="text/javascript">
-        Parse.initialize("dxTVScOdhW0EEjfB7oY36ydBaOeEbGgKpNEaFYI7", "9tWqc8nV8a3myB6clMgmkNhJwetyoGmdmhmtfdbQ");
-    </script>
-    <script src="scripts/furniture.js"></script>
+</div>
+<script type="text/javascript">
+    Parse.initialize("4CvprWuYdYI5qEBD2NksCO4GgmisGl9Tl2nyLMou", "orfUW9HnoPIK5kwaaOSGEd1HyDKwtGwtJBTP5gxo");
+</script>
+<script src="scripts/furniture.js"></script>
 </body>
 </html>

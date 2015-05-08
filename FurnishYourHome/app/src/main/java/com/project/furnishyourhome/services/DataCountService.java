@@ -96,12 +96,12 @@ public class DataCountService extends Service {
             try {
                 count = query.count();
                 isUpdated = true;
-
-                try {
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//
+//                try {
+//                    Thread.sleep(60000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }

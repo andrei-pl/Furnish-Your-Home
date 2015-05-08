@@ -3,6 +3,10 @@
     margin: 10px auto;
 }
 
+#container-info{
+    background-color: lightgoldenrodyellow;
+}
+
 .container-item {
     width: 300px;
     margin: 10px 0;
@@ -21,6 +25,10 @@
     display:inline-block;
 }
 
+#manyToManyTable{
+    background-color: aliceblue;
+}
+
 input[type=text]{
     margin: 2px 0;
 }
@@ -37,4 +45,10 @@ input[type=text]{
 .additional-info {
     color: red;
     margin-top:0;
+}
+
+.results {
+    background-color: lightgoldenrodyellow;
+    border: 1px solid #000000;
+    border-radius: 5px;
 }

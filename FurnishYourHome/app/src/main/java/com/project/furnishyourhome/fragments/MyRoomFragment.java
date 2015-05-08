@@ -262,7 +262,6 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 loadData(true);
 
                 showNotification();
-                Log.d("MyRoomFragment", "The data was updated");
             }
             updateListHandler.postDelayed(taskUpdateList, 10000);
         }
@@ -515,9 +514,10 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
                 ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_FURNITURES);
                 ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_TYPES);
                 ((FYHApp) activity.getApplication()).getUtilitiesDb().deleteTable(TABLE_STORESFURNITURES);
+                itemsCountInDb = 0;
             }
 
-            if (itemsCountInDb < furnitures.size()) {
+            if (itemsCountInDb < storesFurnituresList.size()) {
                 boolean isSavedTypesIntoDB = ((FYHApp) activity.getApplication()).getUtilitiesDb().addTypes(types);
                 if (isSavedTypesIntoDB) {
                     Log.d("Database", "Types saved into DB");
@@ -538,6 +538,7 @@ public class MyRoomFragment extends Fragment implements DbTableNames {
             args.putParcelableArrayList("horizontalListItems", listItems);
             horizontalListItems = listItems;
 
+            Log.d("MyRoomFragment", "The data was updated");
             MainActivity.instance.refreshData();
             setTwoWayViewList();
 
